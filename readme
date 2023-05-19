@@ -1,5 +1,4 @@
 
-Please return in a Word Doc or Github link. Thanks!
 
 Write a tool that will connect to a Cassandra cluster and collect performance-related metrics.
 The metrics to collect should include, but not be limited to:
@@ -12,55 +11,3 @@ Number of active connections
 Storage space utilization
 
 The output should be displayed on the command-line in key-value type of format
-
-
-
-
-package main
-
-import (
-	"fmt"
-	"log"
-	"time"
-
-	"github.com/gocql/gocql"
-)
-
-func main() {
-	// Connect to Cassandra cluster
-	cluster := gocql.NewCluster("127.0.0.1") // datastax local 
-	cluster.Keyspace = "system"
-	cluster.Consistency = gocql.Quorum
-	session, err := cluster.CreateSession()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer session.Close()
-
-	// Retrieve metrics
-	metrics := []string{
-		"Select cluster_name FROM dse_perf.local WHERE key='local'",
-		//"SELECT value FROM system.local WHERE key='cpu'",
-		//"SELECT value FROM system.local WHERE key='memory'",
-		//"SELECT value FROM system.local WHERE key='read_latency'",
-		//"SELECT value FROM system.local WHERE key='write_latency'",
-		//"SELECT value FROM system.local WHERE key='pending_compactions'",
-		//"SELECT value FROM system.local WHERE key='active_connections'",
-		//"SELECT value FROM system.local WHERE key='storage'",
-	}
-
-	for _, metric := range metrics {
-		var value string
-		if err := session.Query(metric).Consistency(gocql.One).Scan(&value); err != nil {
-			log.Println("Error retrieving metric:", err)
-			continue
-		}
-
-		fmt.Println("Metric:", metric)
-		fmt.Println("Value:", value)
-		fmt.Println("-----------------------------")
-	}
-
-	// Wait for the results to be printed
-	time.Sleep(2 * time.Second)
-}
